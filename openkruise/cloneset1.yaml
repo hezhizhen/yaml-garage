@@ -1,0 +1,25 @@
+apiVersion: apps.kruise.io/v1alpha1
+kind: CloneSet
+metadata:
+  name: demo-clone
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: guestbook
+  template: # Pod template 和 Deployment 的结构完全一致。
+    metadata:
+      labels:
+        app: guestbook
+    spec:
+      containers:
+        - name: guestbook
+          image: registry.cn-hangzhou.aliyuncs.com/kruise-test/guestbook:v1
+          env:
+            - name: test
+              value: foo
+  updateStrategy:
+    type: InPlaceIfPossible # 尽量使用原地升级，否则重建升级。
+    maxUnavailable: 20% # 发布过程最多 20% 不可用。
+    inPlaceUpdateStrategy:
+      gracePeriodSeconds: 3 # 每个 Pod 原地升级前 Not Ready 优雅等待时间。
